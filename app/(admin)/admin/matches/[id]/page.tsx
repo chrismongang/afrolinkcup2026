@@ -34,10 +34,7 @@ const groupStatusOptions = [
 
 const knockoutStatusOptions = [
   { value: "SCHEDULED", label: "Geplant" },
-  { value: "LIVE_FIRST_HALF", label: "1. Halbzeit" },
-  { value: "HALF_TIME", label: "Halbzeit" },
-  { value: "LIVE_SECOND_HALF", label: "2. Halbzeit" },
-  { value: "EXTRA_TIME", label: "Verlängerung" },
+  { value: "LIVE", label: "Läuft" },
   { value: "PENALTIES", label: "Elfmeterschießen" },
   { value: "FINISHED", label: "Beendet" },
 ]
@@ -274,6 +271,16 @@ export default function AdminMatchDetailPage({
     setError("")
 
     try {
+      // Bei KO-Spielen: Wenn FINISHED und Unentschieden, dann direkt zu Elfmeterschießen
+      if (
+        newStatus === "FINISHED" &&
+        currentMatch.stage !== "GROUP" &&
+        currentMatch.score_home === currentMatch.score_away
+      ) {
+        // Unentschieden bei KO-Spiel -> direkt Elfmeterschießen
+        newStatus = "PENALTIES"
+      }
+
       const response = await fetch(`/api/admin/matches/${currentMatch.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -392,18 +399,12 @@ export default function AdminMatchDetailPage({
   async function quickAction(action: string) {
     if (!match) return
 
-    const statusMap: Record<string, string> =
-      currentMatch.stage === "GROUP"
-        ? {
-            start: "LIVE",
-            finish: "FINISHED",
-          }
-        : {
-            start: "LIVE_FIRST_HALF",
-            halftime: "HALF_TIME",
-            secondHalf: "LIVE_SECOND_HALF",
-            finish: "FINISHED",
-          }
+    // Alle Spiele (Gruppen- und KO-Spiele) haben die gleiche Logik: LIVE -> FINISHED
+    // Bei KO-Spielen wird bei Unentschieden automatisch Elfmeterschießen ausgelöst
+    const statusMap: Record<string, string> = {
+      start: "LIVE",
+      finish: "FINISHED",
+    }
 
     if (statusMap[action]) {
       await handleUpdateStatus(statusMap[action])

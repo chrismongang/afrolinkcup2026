@@ -35,11 +35,12 @@ export function PlayerCard({ player, team }: PlayerCardProps) {
                 unoptimized
                 onError={() => setImageError(true)}
               />
-            ) : null}
-            {/* Fallback Platzhalter - wird angezeigt wenn kein photo_url vorhanden ist oder Bild nicht geladen werden kann */}
-            <div className="absolute inset-0 bg-muted flex items-center justify-center text-2xl">
-              ⚽
-            </div>
+            ) : (
+              /* Fallback Platzhalter - wird angezeigt wenn kein photo_url vorhanden ist oder Bild nicht geladen werden kann */
+              <div className="absolute inset-0 bg-muted flex items-center justify-center text-2xl">
+                ⚽
+              </div>
+            )}
           </div>
 
           {/* Spieler-Informationen */}

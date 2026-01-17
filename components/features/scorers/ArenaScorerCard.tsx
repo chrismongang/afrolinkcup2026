@@ -76,11 +76,12 @@ export function ArenaScorerCard({ scorer, rank }: ArenaScorerCardProps) {
               unoptimized
               onError={() => setImageError(true)}
             />
-          ) : null}
-          {/* Fallback Platzhalter */}
-          <div className="absolute inset-0 bg-muted flex items-center justify-center text-5xl md:text-6xl lg:text-7xl">
-            ⚽
-          </div>
+          ) : (
+            /* Fallback Platzhalter */
+            <div className="absolute inset-0 bg-muted flex items-center justify-center text-5xl md:text-6xl lg:text-7xl">
+              ⚽
+            </div>
+          )}
         </div>
 
         {/* Spielername */}

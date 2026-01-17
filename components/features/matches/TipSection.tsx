@@ -19,8 +19,8 @@ import { RegisterDialog } from "@/components/features/auth/RegisterDialog"
 import { cn } from "@/lib/utils"
 
 type MatchWithTeams = Match & {
-  team_home: Team
-  team_away: Team
+  team_home: Team | null
+  team_away: Team | null
 }
 
 interface TipSectionProps {
@@ -28,6 +28,22 @@ interface TipSectionProps {
 }
 
 export function TipSection({ match }: TipSectionProps) {
+  // Wenn Teams noch nicht feststehen, zeige eine Nachricht
+  if (!match.team_home || !match.team_away) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-muted-foreground">
+            <p className="text-lg font-medium mb-2">Teams noch nicht festgelegt</p>
+            <p className="text-sm">
+              Die Teams für dieses Spiel werden automatisch aktualisiert, sobald die vorherigen Spiele beendet sind.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const { userTip, distribution, loading, submitWinnerTip, submitScoreTip } =
     useMatchTips(match.id)
   const [isSubmittingWinner, setIsSubmittingWinner] = useState(false)
@@ -120,8 +136,8 @@ export function TipSection({ match }: TipSectionProps) {
   const drawColor = "#cccccc" // Gray
   const awayColor = "#ff0050" // Red
 
-  // Show percentages after user has clicked or if there are votes
-  const showPercentages = hasWinnerTip || total > 0
+  // Show percentages only after user has voted
+  const showPercentages = hasWinnerTip
 
   // Get predicted winner for preview
   const predictedWinner =
@@ -171,7 +187,7 @@ export function TipSection({ match }: TipSectionProps) {
                 "hover:bg-muted/60 active:scale-[0.98]"
               )}
               style={{
-                flexBasis: total > 0 ? `${homePercent}%` : "33.33%",
+                flexBasis: hasWinnerTip ? `${homePercent}%` : "33.33%",
                 minWidth: "80px",
                 backgroundColor: "#1E1E1E",
               }}
@@ -196,7 +212,7 @@ export function TipSection({ match }: TipSectionProps) {
                 "hover:bg-muted/60 active:scale-[0.98]"
               )}
               style={{
-                flexBasis: total > 0 ? `${drawPercent}%` : "33.33%",
+                flexBasis: hasWinnerTip ? `${drawPercent}%` : "33.33%",
                 minWidth: "80px",
                 backgroundColor: "#1E1E1E",
               }}
@@ -220,7 +236,7 @@ export function TipSection({ match }: TipSectionProps) {
                 "hover:bg-muted/60 active:scale-[0.98]"
               )}
               style={{
-                flexBasis: total > 0 ? `${awayPercent}%` : "33.33%",
+                flexBasis: hasWinnerTip ? `${awayPercent}%` : "33.33%",
                 minWidth: "80px",
                 backgroundColor: "#1E1E1E",
               }}

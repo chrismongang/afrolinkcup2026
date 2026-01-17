@@ -7,8 +7,8 @@ import { formatTime } from "@/lib/utils/format"
 import type { Match, Team } from "@/types"
 
 type MatchWithTeams = Match & {
-  team_home: Team
-  team_away: Team
+  team_home: Team | null
+  team_away: Team | null
 }
 
 interface MatchCardProps {
@@ -47,9 +47,11 @@ export function MatchCard({ match }: MatchCardProps) {
   const startTime = new Date(match.start_time)
   const isFinished = match.status === "FINISHED"
   const showScore = isFinished || isLive
+  
+  // Wenn Teams noch nicht feststehen, ist die Karte nicht klickbar
+  const hasTeams = match.team_home !== null && match.team_away !== null
 
-  return (
-    <Link href={`/matches/${match.id}`} className="block">
+  const cardContent = (
       <Card className={`transition-colors hover:bg-card/80 ${isLive ? "ring-2 ring-primary rounded-xl" : ""}`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
@@ -66,14 +68,34 @@ export function MatchCard({ match }: MatchCardProps) {
             <div className="flex-1 space-y-2">
               {/* Home Team */}
               <div className="flex items-center space-x-2">
-                <span className="text-xl">{match.team_home.flag_emoji}</span>
-                <span className="font-medium text-foreground">{match.team_home.name}</span>
+                {match.team_home ? (
+                  <>
+                    <span className="text-xl">{match.team_home.flag_emoji}</span>
+                    <span className="font-medium text-foreground">{match.team_home.name}</span>
+                  </>
+                ) : (
+                  <span className="font-medium text-muted-foreground italic">
+                    {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '1. Gruppe A' :
+                     match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '1. Gruppe B' :
+                     match.stage === 'FINAL' ? 'Sieger HF1' : 'TBD'}
+                  </span>
+                )}
               </div>
 
               {/* Away Team */}
               <div className="flex items-center space-x-2">
-                <span className="text-xl">{match.team_away.flag_emoji}</span>
-                <span className="font-medium text-foreground">{match.team_away.name}</span>
+                {match.team_away ? (
+                  <>
+                    <span className="text-xl">{match.team_away.flag_emoji}</span>
+                    <span className="font-medium text-foreground">{match.team_away.name}</span>
+                  </>
+                ) : (
+                  <span className="font-medium text-muted-foreground italic">
+                    {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '2. Gruppe B' :
+                     match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '2. Gruppe A' :
+                     match.stage === 'FINAL' ? 'Sieger HF2' : 'TBD'}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -102,7 +124,21 @@ export function MatchCard({ match }: MatchCardProps) {
           </div>
         </CardContent>
       </Card>
-    </Link>
+  )
+
+  if (hasTeams) {
+    return (
+      <Link href={`/matches/${match.id}`} className="block">
+        {cardContent}
+      </Link>
+    )
+  }
+
+  // Wenn Teams noch nicht feststehen, zeige die Karte ohne Link
+  return (
+    <div className="block opacity-75 cursor-not-allowed">
+      {cardContent}
+    </div>
   )
 }
 

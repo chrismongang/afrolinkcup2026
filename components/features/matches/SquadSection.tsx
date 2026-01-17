@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils"
 import type { Match, Team, Player } from "@/types"
 
 type MatchWithTeams = Match & {
-  team_home: Team
-  team_away: Team
+  team_home: Team | null
+  team_away: Team | null
 }
 
 interface SquadSectionProps {
@@ -135,6 +135,22 @@ function TeamheadStaffRow({
 }
 
 export function SquadSection({ match }: SquadSectionProps) {
+  // Wenn Teams noch nicht feststehen, zeige eine Nachricht
+  if (!match.team_home || !match.team_away) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-muted-foreground">
+            <p className="text-lg font-medium mb-2">Kader noch nicht verfügbar</p>
+            <p className="text-sm">
+              Die Kader werden angezeigt, sobald die Teams für dieses Spiel feststehen.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const { homeSquad, awaySquad, loading } = useMatchSquads(
     match.team_home.id,
     match.team_away.id

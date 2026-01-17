@@ -54,11 +54,12 @@ export function ScorerCard({ scorer, rank }: ScorerCardProps) {
                   unoptimized
                   onError={() => setImageError(true)}
                 />
-              ) : null}
-              {/* Fallback Platzhalter */}
-              <div className="absolute inset-0 bg-muted flex items-center justify-center text-2xl">
-                ⚽
-              </div>
+              ) : (
+                /* Fallback Platzhalter */
+                <div className="absolute inset-0 bg-muted flex items-center justify-center text-2xl">
+                  ⚽
+                </div>
+              )}
             </div>
 
             {/* Spieler-Informationen */}

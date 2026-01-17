@@ -6,8 +6,8 @@ import { formatTime, calculateLiveMinute } from "@/lib/utils/format"
 import type { Match, Team, MatchEvent, Player } from "@/types"
 
 type MatchWithTeams = Match & {
-  team_home: Team
-  team_away: Team
+  team_home: Team | null
+  team_away: Team | null
 }
 
 type MatchEventWithDetails = MatchEvent & {
@@ -59,29 +59,29 @@ export function MatchHeader({ match, events = [], currentMinute }: MatchHeaderPr
 
   // Extract goals for each team
   // Note: OWN_GOAL counts for the opposing team
-  const homeGoals = events
+  const homeGoals = match.team_home ? events
     .filter((e) => {
       if (e.type === "GOAL") {
-        return e.team_id === match.team_home.id
+        return e.team_id === match.team_home!.id
       }
       if (e.type === "OWN_GOAL") {
-        return e.team_id === match.team_away.id // Own goal by away team counts for home
+        return match.team_away && e.team_id === match.team_away.id // Own goal by away team counts for home
       }
       return false
     })
-    .sort((a, b) => a.minute - b.minute)
+    .sort((a, b) => a.minute - b.minute) : []
 
-  const awayGoals = events
+  const awayGoals = match.team_away ? events
     .filter((e) => {
       if (e.type === "GOAL") {
-        return e.team_id === match.team_away.id
+        return e.team_id === match.team_away!.id
       }
       if (e.type === "OWN_GOAL") {
-        return e.team_id === match.team_home.id // Own goal by home team counts for away
+        return match.team_home && e.team_id === match.team_home.id // Own goal by home team counts for away
       }
       return false
     })
-    .sort((a, b) => a.minute - b.minute)
+    .sort((a, b) => a.minute - b.minute) : []
 
   // Calculate live minute automatically when match is live
   useEffect(() => {
@@ -140,20 +140,32 @@ export function MatchHeader({ match, events = [], currentMinute }: MatchHeaderPr
       {/* Teams & Score - Nebeneinander */}
       <div className="flex items-center justify-between mt-4">
         {/* Home Team */}
-        <Link
-          href={`/teams/${match.team_home.team_slug}`}
-          className="flex-1 flex flex-col items-center hover:opacity-90 transition-opacity"
-        >
-          <div className="text-5xl mb-2 drop-shadow-lg">{match.team_home.flag_emoji}</div>
-          <div className="text-center">
-            <div className="text-base sm:text-lg font-semibold">
-              {match.team_home.name}
+        {match.team_home ? (
+          <Link
+            href={`/teams/${match.team_home.team_slug}`}
+            className="flex-1 flex flex-col items-center hover:opacity-90 transition-opacity"
+          >
+            <div className="text-5xl mb-2 drop-shadow-lg">{match.team_home.flag_emoji}</div>
+            <div className="text-center">
+              <div className="text-base sm:text-lg font-semibold">
+                {match.team_home.name}
+              </div>
+            </div>
+          </Link>
+        ) : (
+          <div className="flex-1 flex flex-col items-center">
+            <div className="text-center">
+              <div className="text-base sm:text-lg font-semibold text-white/80 italic">
+                {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '1. Gruppe A' :
+                 match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '1. Gruppe B' :
+                 match.stage === 'FINAL' ? 'Sieger HF1' : 'TBD'}
+              </div>
             </div>
           </div>
-        </Link>
+        )}
 
         {/* Score oder Uhrzeit */}
-        {showScore ? (
+        {showScore && match.team_home && match.team_away ? (
           <div className="px-4 sm:px-8">
             <div className="text-4xl sm:text-5xl font-extrabold tracking-tight drop-shadow-xl">
               {match.score_home} - {match.score_away}
@@ -168,17 +180,29 @@ export function MatchHeader({ match, events = [], currentMinute }: MatchHeaderPr
         ) : null}
 
         {/* Away Team */}
-        <Link
-          href={`/teams/${match.team_away.team_slug}`}
-          className="flex-1 flex flex-col items-center hover:opacity-90 transition-opacity"
-        >
-          <div className="text-5xl mb-2 drop-shadow-lg">{match.team_away.flag_emoji}</div>
-          <div className="text-center">
-            <div className="text-base sm:text-lg font-semibold">
-              {match.team_away.name}
+        {match.team_away ? (
+          <Link
+            href={`/teams/${match.team_away.team_slug}`}
+            className="flex-1 flex flex-col items-center hover:opacity-90 transition-opacity"
+          >
+            <div className="text-5xl mb-2 drop-shadow-lg">{match.team_away.flag_emoji}</div>
+            <div className="text-center">
+              <div className="text-base sm:text-lg font-semibold">
+                {match.team_away.name}
+              </div>
+            </div>
+          </Link>
+        ) : (
+          <div className="flex-1 flex flex-col items-center">
+            <div className="text-center">
+              <div className="text-base sm:text-lg font-semibold text-white/80 italic">
+                {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '2. Gruppe B' :
+                 match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '2. Gruppe A' :
+                 match.stage === 'FINAL' ? 'Sieger HF2' : 'TBD'}
+              </div>
             </div>
           </div>
-        </Link>
+        )}
       </div>
 
       {/* Dünne Linie */}

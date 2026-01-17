@@ -5,8 +5,8 @@ import { formatTime, calculateLiveMinute } from "@/lib/utils/format"
 import type { Match, Team, MatchEvent, Player } from "@/types"
 
 type MatchWithTeams = Match & {
-  team_home: Team
-  team_away: Team
+  team_home: Team | null
+  team_away: Team | null
 }
 
 type MatchEventWithDetails = MatchEvent & {
@@ -112,18 +112,30 @@ export function ArenaMatchHeader({ match, events = [], currentMinute }: ArenaMat
       <div className="flex items-center justify-between mt-8 md:mt-12">
         {/* Home Team */}
         <div className="flex-1 flex flex-col items-center">
-          <div className="text-[10rem] md:text-[14rem] lg:text-[18rem] xl:text-[22rem] mb-6 md:mb-8 drop-shadow-2xl leading-none">
-            {match.team_home.flag_emoji}
-          </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase">
-              {match.team_home.name}
+          {match.team_home ? (
+            <>
+              <div className="text-[10rem] md:text-[14rem] lg:text-[18rem] xl:text-[22rem] mb-6 md:mb-8 drop-shadow-2xl leading-none">
+                {match.team_home.flag_emoji}
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase">
+                  {match.team_home.name}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center">
+              <div className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase text-white/80">
+                {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '1. Gruppe A' :
+                 match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '1. Gruppe B' :
+                 match.stage === 'FINAL' ? 'Sieger HF1' : 'TBD'}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Score oder Uhrzeit */}
-        {showScore ? (
+        {showScore && match.team_home && match.team_away ? (
           <div className="px-8 md:px-12 lg:px-16">
             <div className="text-7xl md:text-9xl lg:text-[10rem] font-black tracking-tight drop-shadow-2xl">
               {match.score_home} - {match.score_away}
@@ -139,14 +151,26 @@ export function ArenaMatchHeader({ match, events = [], currentMinute }: ArenaMat
 
         {/* Away Team */}
         <div className="flex-1 flex flex-col items-center">
-          <div className="text-[10rem] md:text-[14rem] lg:text-[18rem] xl:text-[22rem] mb-6 md:mb-8 drop-shadow-2xl leading-none">
-            {match.team_away.flag_emoji}
-          </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase">
-              {match.team_away.name}
+          {match.team_away ? (
+            <>
+              <div className="text-[10rem] md:text-[14rem] lg:text-[18rem] xl:text-[22rem] mb-6 md:mb-8 drop-shadow-2xl leading-none">
+                {match.team_away.flag_emoji}
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase">
+                  {match.team_away.name}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center">
+              <div className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase text-white/80">
+                {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '2. Gruppe B' :
+                 match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '2. Gruppe A' :
+                 match.stage === 'FINAL' ? 'Sieger HF2' : 'TBD'}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

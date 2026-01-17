@@ -66,13 +66,31 @@ export default function AdminDashboardPage() {
             </h1>
             <p className="text-gray-400 text-sm">Afrolink Cup 2026</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-gray-700 text-gray-300 hover:bg-[#1E1E1E]"
-          >
-            Abmelden
-          </Button>
+          <div className="flex gap-3">
+            <Link href="/admin/screens">
+              <Button
+                variant="outline"
+                className="border-gray-700 text-gray-300 hover:bg-[#1E1E1E]"
+              >
+                Arena Screens
+              </Button>
+            </Link>
+            <Link href="/admin/players">
+              <Button
+                variant="outline"
+                className="border-gray-700 text-gray-300 hover:bg-[#1E1E1E]"
+              >
+                Spieler
+              </Button>
+            </Link>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="border-gray-700 text-gray-300 hover:bg-[#1E1E1E]"
+            >
+              Abmelden
+            </Button>
+          </div>
         </div>
 
         {/* Matches List */}
@@ -112,19 +130,45 @@ export default function AdminDashboardPage() {
 
                     <div className="flex items-center gap-3 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg sm:text-xl font-semibold text-white">
-                          {match.team_home.short_name}
-                        </span>
-                        <span className="text-lg sm:text-xl">{match.team_home.flag_emoji}</span>
+                        {match.team_home ? (
+                          <>
+                            <span className="text-lg sm:text-xl font-semibold text-white">
+                              {match.team_home.short_name}
+                            </span>
+                            <span className="text-lg sm:text-xl">{match.team_home.flag_emoji}</span>
+                          </>
+                        ) : (
+                          <span className="text-lg sm:text-xl font-semibold text-white/60 italic">
+                            {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '1. Gruppe A' :
+                             match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '1. Gruppe B' :
+                             match.stage === 'FINAL' ? 'Sieger HF1' : 'TBD'}
+                          </span>
+                        )}
                       </div>
-                      <div className="text-xl sm:text-2xl font-bold text-[#EEF757]">
-                        {match.score_home} : {match.score_away}
-                      </div>
+                      {match.team_home && match.team_away ? (
+                        <div className="text-xl sm:text-2xl font-bold text-[#EEF757]">
+                          {match.score_home} : {match.score_away}
+                        </div>
+                      ) : (
+                        <div className="text-xl sm:text-2xl font-bold text-[#EEF757]">
+                          vs
+                        </div>
+                      )}
                       <div className="flex items-center gap-2">
-                        <span className="text-lg sm:text-xl">{match.team_away.flag_emoji}</span>
-                        <span className="text-lg sm:text-xl font-semibold text-white">
-                          {match.team_away.short_name}
-                        </span>
+                        {match.team_away ? (
+                          <>
+                            <span className="text-lg sm:text-xl">{match.team_away.flag_emoji}</span>
+                            <span className="text-lg sm:text-xl font-semibold text-white">
+                              {match.team_away.short_name}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-lg sm:text-xl font-semibold text-white/60 italic">
+                            {match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-1-2026-01-17' ? '2. Gruppe B' :
+                             match.stage === 'SEMIFINAL' && (match as any).match_slug === 'halbfinale-2-2026-01-17' ? '2. Gruppe A' :
+                             match.stage === 'FINAL' ? 'Sieger HF2' : 'TBD'}
+                          </span>
+                        )}
                       </div>
                     </div>
 

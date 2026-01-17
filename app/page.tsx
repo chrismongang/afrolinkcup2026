@@ -7,6 +7,7 @@ import { GroupTableCard } from "@/components/features/groups/GroupTableCard"
 import { NewsSection } from "@/components/features/news/NewsSection"
 import { TopScorersSection } from "@/components/features/scorers/TopScorersSection"
 import { TopLeaderboardSection } from "@/components/features/leaderboard/TopLeaderboardSection"
+import { Footer } from "@/components/features/navigation/Footer"
 import Image from "next/image"
 
 export default function Home() {
@@ -77,6 +78,9 @@ export default function Home() {
         {/* News Section - Articles without specific match/team */}
         <NewsSection limit={6} horizontal={true} />
       </div>
+
+      {/* Footer */}
+      <Footer />
     </main>
   )
 }

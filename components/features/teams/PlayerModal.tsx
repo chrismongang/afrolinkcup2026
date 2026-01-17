@@ -42,11 +42,12 @@ export function PlayerModal({ player, team, open, onOpenChange }: PlayerModalPro
                 unoptimized
                 onError={() => setImageError(true)}
               />
-            ) : null}
-            {/* Fallback Platzhalter */}
-            <div className="absolute inset-0 bg-muted flex items-center justify-center text-5xl">
-              ⚽
-            </div>
+            ) : (
+              /* Fallback Platzhalter */
+              <div className="absolute inset-0 bg-muted flex items-center justify-center text-5xl">
+                ⚽
+              </div>
+            )}
           </div>
 
           {/* Name */}
