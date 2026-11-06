@@ -39,3 +39,9 @@ supabase/.temp
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# third-party venue documents (kept locally, not published)
+docs/Arenadisplay/
+
+# editor
+.cursor/
